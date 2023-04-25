@@ -1,3 +1,4 @@
+# electronics imports
 import board
 import external
 import time
@@ -5,8 +6,8 @@ import measure
 import statemachine
 import buzzer
 import config
-import numpy as np
 
+# custom files
 import telemetry
 import parachute
 
