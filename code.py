@@ -7,16 +7,39 @@ import buzzer
 import config
 import numpy as np
 
+import telemetry
+import parachute
 
 
-delay_pyro_miliseconds = config.get_deployment_timer()
-print(f'Read in a delay of {delay_pyro_miliseconds} ms from the config file')
 
-states = statemachine.Statemachine(PYRO_FIRE_DELAY_MS = delay_pyro_miliseconds)
+apogee = config.get_apogee()
+window_before = config.get_window_before()
+window_after = config.get_window_after()
 
-def pressureToAltitude(pressure):
-    return (temp_0 / LAPSE_RATE) * ((pressure / pressure_0) ** (-R * LAPSE_RATE / GRAV * M_earth) - 1)
+rocket = statemachine.Statemachine(PYRO_FIRE_DELAY_MS = apogee + window_after)
+
+def initialize():
+    pass
+
+# detonate blackpowder
+def detonate_blackpowder():
+    rocket.do_state_transition(States.DEPLOYED_MODE)
 
 while True:
     buzzer.buzzer_tick()
-    states.tick()
+    rocket.tick()
+
+    if rocket.LAUNCHED:
+        launched = time.monotonic()*1000 - rocket.launched_time
+        telemetry.log(launched)
+
+        if launched > apogee - window_before:
+            # in deployment window
+            pressure_log = telemetry.pressure_log
+
+            if parachute.detectApogee(pressure_log):
+                detonate_blackpowder() # kaboom >:)
+
+
+
+    time.sleep(0.01) # get somewhere under 100 measurements a second
