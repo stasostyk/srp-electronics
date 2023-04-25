@@ -36,8 +36,9 @@ while True:
         if launched > apogee - window_before:
             # in deployment window
             pressure_log = telemetry.pressure_log
+            time_log = telemetry.time_log
 
-            if parachute.detectApogee(pressure_log):
+            if parachute.detectApogee(pressure_log, time_log):
                 detonate_blackpowder() # kaboom >:)
 
 
