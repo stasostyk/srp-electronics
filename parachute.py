@@ -7,5 +7,7 @@ R = 8.31432
 LAPSE_RATE = 0.0065
 
 
-def detectApogee(pressure_log):
-    return True
+def detectApogee(pressure_log, time_log):
+    slope, intercept = np.polyfit(time_log, pressure_log, 1)
+
+    return slope >= 0
