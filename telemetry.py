@@ -26,9 +26,8 @@ bmp280 = adafruit_bmp280.Adafruit_BMP280_I2C(i2c)
 
 # initialize SD Card
 # Use the board's primary SPI bus
-spi = board.SPI()
-#spi = busio.SPI(board.SD_SCK, MOSI=board.SD_MOSI, MISO=board.SD_MISO)
-cs = board.D10
+spi = busio.SPI(board.SCK, MOSI=board.MOSI, MISO=board.MISO)
+cs = board.D11
 
 sdcard = sdcardio.SDCard(spi, cs)
 vfs = storage.VfsFat(sdcard)
