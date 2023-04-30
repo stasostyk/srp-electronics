@@ -1,6 +1,11 @@
-import numpy as np
+from ulab import numpy as np
 
 def detectApogee(pressure_log, time_log):
-    slope, intercept = np.polyfit(time_log, pressure_log, 1)
+    print(len(pressure_log))
+    print(len(time_log))
+    if len(pressure_log) > 5:
+        slope, intercept = np.polyfit(time_log, pressure_log, 1)
+        print(slope)
 
-    return slope >= 0
+        return slope >= 0.05
+    return False
