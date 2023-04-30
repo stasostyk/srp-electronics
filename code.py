@@ -19,17 +19,11 @@ window_after = config.get_window_after()
 
 rocket = statemachine.Statemachine(PYRO_FIRE_DELAY_MS = apogee + window_after)
 
-def initialize():
-    pass
-
 # detonate blackpowder
 def detonate_blackpowder():
     rocket.do_state_transition(States.DEPLOYED_MODE)
 
-while True:
-    buzzer.buzzer_tick()
-    rocket.tick()
-
+def main():
     if rocket.LAUNCHED:
         launched = time.monotonic()*1000 - rocket.launched_time
         telemetry.log(launched)
@@ -42,6 +36,25 @@ while True:
             if parachute.detectApogee(pressure_log, time_log):
                 detonate_blackpowder() # kaboom >:)
 
+def rocketTesting(launched):
+    telemetry.log(launched)
 
+    pressure_log = telemetry.pressure_log
+    time_log = telemetry.time_log
+
+    if parachute.detectApogee(pressure_log, time_log):
+        buzzer.append_buzzer_note(300, 200)
+        buzzer.append_buzzer_wait(500)
+
+initial_time = time.monotonic()
+telemetry.initialHeight()
+
+while True:
+    buzzer.buzzer_tick()
+
+    rocketTesting(initial_time)
+
+    # rocket.tick()
+    # main()
 
     time.sleep(0.01) # get somewhere under 100 measurements a second
