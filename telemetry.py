@@ -6,23 +6,17 @@ import busio
 import sdcardio
 import storage
 
-# PHYSICS CONSTANTS
-M_earth = 0.0289644
-GRAV = 9.80665
-R = 8.31432
-LAPSE_RATE = 0.0065
-
-# derived constants
-p_constant = -R * LAPSE_RATE / GRAV * M_earth) - 1
+# telemetry variables
+now = time.localtime()
+filename = f'{now.tm_year}-{now.tm_mon}-{now.tm_mday}_{now.tm_hour}-{now.tm_min}-{now.tm_sec}-({time.monotonic_ns()}).txt'
 
 # data readings
 pressure_log = [] # log of last two seconds of data
 time_log = [] # log of time for last two seconds of data
-initial_height = 0 # log of initial heights
 
 # initialize sensors
-i2c = board.I2C()  # uses board.SCL and board.SDA
-bmp280 = adafruit_bmp280.Adafruit_BMP280_I2C(i2c)
+i2c = busio.I2C(board.SCL, board.SDA)   # uses board.SCL and board.SDA
+bmp280 = adafruit_bmp280.Adafruit_BMP280_I2C(i2c, 0x76) # BMP is on address 76
 
 # initialize SD Card
 # Use the board's primary SPI bus
@@ -40,33 +34,37 @@ def initialHeight():
     # save average of readings to initial heights
     # log average initial height to SD Card
 
-    bmp280.sea_level_pressure = 1013.25
-    pass
+    readings = []
+    for i in range(5):
+        readings.append(bmp280.pressure)
+        time.sleep(0.1)
 
-def pressureToAltitude(pressure):
-    return (temp_0 / LAPSE_RATE)
-            * ((pressure / pressure_0)  #
-            ** p_constant # raised to the power of constant
+    avg = sum(readings) / len(readings)
+    bmp280.sea_level_pressure = avg
 
-def updateQueue(pressure, t):
-    if len(pressure_log) >= 150:
+    with open("/sd/data/" + filename, 'a') as f:
+        f.write(f'Flight Data for CHKN-1 in format time (s), altitude (m), pressure (Pa), temperature (C)\n')
+        f.write(f'initial pressure: {avg}\n')
+        f.close()
+
+
+
+def updateLogQueue(pressure, t):
+    if len(time_log) > 0 and t - time_log[0] >= 2:
         pressure_log.pop(0)
         time_log.pop(0)
 
-    pressure_log.push(pressure)
-    time_log.push(t)
+    pressure_log.append(pressure)
+    time_log.append(t)
 
 
 def writeToBreakoutBoard(t, altitude, pressure, temperature):
-    with open("/sd/data.txt", 'a') as f:
-        f.write(t + ",")
-        f.write(altitude + ",")
-        f.write(pressure + ",")
-        f.write(temperature + "\n")
+    with open("/sd/data/" + filename, 'a') as f:
+        f.write(f'{t}, {altitude}, {pressure}, {temperature}\n')
         f.close()
 
 def log(launched):
     alt, press, temp = bmp280.altitude, bmp280.pressure, bmp280.temperature
-    t = time.monotonic() * 1000 - launched
-    updateQueue(press, t)
+    t = time.monotonic() - launched
+    updateLogQueue(press, t)
     writeToBreakoutBoard(t, alt, press, temp)
