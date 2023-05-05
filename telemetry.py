@@ -42,7 +42,7 @@ def initialHeight():
     avg = sum(readings) / len(readings)
     bmp280.sea_level_pressure = avg
 
-    with open("/sd/data/" + filename, 'a') as f:
+    with open("/sd/data/" + filename, 'w') as f:
         f.write(f'Flight Data for CHKN-1 in format time (s), altitude (m), pressure (Pa), temperature (C)\n')
         f.write(f'initial pressure: {avg}\n')
         f.close()
@@ -64,7 +64,9 @@ def writeToBreakoutBoard(t, altitude, pressure, temperature):
         f.close()
 
 def log(launched):
-    alt, press, temp = bmp280.altitude, bmp280.pressure, bmp280.temperature
     t = time.monotonic() - launched
-    updateLogQueue(press, t)
-    writeToBreakoutBoard(t, alt, press, temp)
+
+    if t > 300: # 5 minute timeout for data logging
+        alt, press, temp = bmp280.altitude, bmp280.pressure, bmp280.temperature
+        updateLogQueue(press, t)
+        writeToBreakoutBoard(t, alt, press, temp)

@@ -25,8 +25,8 @@ def detonate_blackpowder():
 
 def main():
     if rocket.LAUNCHED:
-        launched = time.monotonic()*1000 - rocket.launched_time
-        telemetry.log(launched)
+        launched = time.monotonic() - (rocket.launched_time / 1000)
+        telemetry.log(launched) # log flight data to SD card
 
         if launched > apogee - window_before:
             # in deployment window
@@ -35,6 +35,8 @@ def main():
 
             if parachute.detectApogee(pressure_log, time_log):
                 detonate_blackpowder() # kaboom >:)
+    else:
+        initialHeight()
 
 def rocketTesting(launched):
     telemetry.log(launched)
@@ -46,15 +48,15 @@ def rocketTesting(launched):
         buzzer.append_buzzer_note(300, 200)
         buzzer.append_buzzer_wait(500)
 
-initial_time = time.monotonic()
-telemetry.initialHeight()
+### initial time
+# initial_time = time.monotonic()
 
 while True:
     buzzer.buzzer_tick()
 
-    rocketTesting(initial_time)
+    ### LAUNCH DAY MODE
+    rocket.tick()
+    main()
 
-    # rocket.tick()
-    # main()
-
-    time.sleep(0.01) # get somewhere under 100 measurements a second
+    ### XOR TESTING MODE
+    # rocketTesting(initial_time)
