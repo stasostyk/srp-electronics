@@ -7,5 +7,5 @@ def detectApogee(pressure_log, time_log):
         slope, intercept = np.polyfit(time_log, pressure_log, 1)
         print(slope)
 
-        return slope >= 0.05
+        return slope >= 0.1
     return False
