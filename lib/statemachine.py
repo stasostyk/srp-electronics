@@ -24,6 +24,7 @@ class Statemachine:
                 self.MIN_STATE_DELAY_MS = 500
                 self.PYRO_FIRE_DELAY_MS = PYRO_FIRE_DELAY_MS
                 self.LAUNCHED = False
+                self.autonomously_deploy = False
 
 
         def tick(self):
@@ -161,6 +162,8 @@ class Statemachine:
                 return False
             if self.launched_time == 0: # The launchtimer has not been set yet
                 return False
+            if self.autonomously_deploy == True: # Autonomous apogee detection
+                return True
             if self.launched_time + self.PYRO_FIRE_DELAY_MS < round(time.monotonic()*1000): # The amount of time has passed
                 return True
             else:

@@ -21,7 +21,7 @@ rocket = statemachine.Statemachine(PYRO_FIRE_DELAY_MS = apogee + window_after)
 
 # detonate blackpowder
 def detonate_blackpowder():
-    rocket.do_state_transition(States.DEPLOYED_MODE)
+    rocket.autonomously_deploy = True
 
 def main():
     if rocket.LAUNCHED:
