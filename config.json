@@ -1,5 +1,5 @@
 {
-   "apogee":60,
-   "window_before":5,
-   "window_after":0.5
+   "apogee":13.5,
+   "window_before":3.5,
+   "window_after":1
 }
