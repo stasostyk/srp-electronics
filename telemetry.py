@@ -66,7 +66,7 @@ def writeToBreakoutBoard(t, altitude, pressure, temperature):
 def log(launched):
     t = time.monotonic() - launched
 
-    if t > 300: # 5 minute timeout for data logging
+    if t < 300: # 5 minute timeout for data logging
         alt, press, temp = bmp280.altitude, bmp280.pressure, bmp280.temperature
         updateLogQueue(press, t)
         writeToBreakoutBoard(t, alt, press, temp)
