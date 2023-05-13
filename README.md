@@ -2,6 +2,9 @@
 
 This is the flight software for the Delft Aerospace Rocket Engineering Small Rocket Project, CHKN-1 Rocket. It serves the purposes of autonomous pyrotechnic parachute deployment and telemetry.
 
+Due to military restrictions on launch day, apogee detection had to be implemented with a delay which resulted in high shock loads thus tumbling in terminal velocity until touchdown. All electronics survived.
+![Test](flight-data-tests/FINAL.png)
+
 ## Apogee Detection for Autonomous Pyrotechnic Parachute Deployment
 To optimize recovery speed, the parachute should deploy just after apogee is reached. Therefore, the rocket should detect when it is beginning to descend. This is done via a barometer and linear regression model to detect when the pressure is increasing. At its core, the following simplified code describes the mainloop algorithm (skipping over the boring linear regression code).
 
